@@ -229,12 +229,12 @@ namespace Couchbase.Lite.Auth
             {
                 var mapper = Manager.GetObjectMapper();
 
-                var component1Json = mapper.ReadValue<object>(component1Decoded).AsDictionary<object, object>();
-                var principal = component1Json.Get("principal").AsDictionary<object, object>();
+                var component1Json = mapper.ReadValue<IDictionary<string, object>>(component1Decoded);
+                var principal = component1Json.Get("principal").AsDictionary<string, object>();
 
-                result.Put(AssertionFieldEmail, principal.Get("email"));
+                result[AssertionFieldEmail] = principal.Get("email");
 
-                var component3Json = mapper.ReadValue<object>(component3Decoded).AsDictionary<object, object>();
+                var component3Json = mapper.ReadValue<IDictionary<string, object>>(component3Decoded);
                 result.Put(AssertionFieldOrigin, component3Json.Get("aud"));
 
                 var expObject = (long)component3Json.Get("exp");

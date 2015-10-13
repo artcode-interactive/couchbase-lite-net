@@ -54,7 +54,7 @@ namespace Couchbase.Lite
         [Test] // #447
         public void TestDocumentArraysMaintainOrder()
         {
-            List<int> dateArray = new List<int> { 2015, 6, 14, 1, 10, 0 };
+            var dateArray = new List<int> { 2015, 6, 14, 1, 10, 0 };
             var props = new Dictionary<string, object> {
                 { "starttime", dateArray }
             };

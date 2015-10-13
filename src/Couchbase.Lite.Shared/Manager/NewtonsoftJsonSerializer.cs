@@ -36,7 +36,8 @@ namespace Couchbase.Lite
         #region Constants
 
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings { 
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            Converters = new List<JsonConverter> { new CouchbaseJsonConverter() }
         };
 
         private const string TAG = "NewtonsoftJsonSerializer";

@@ -87,6 +87,47 @@ namespace Couchbase.Lite
         }
 
         [Test]
+        public void TestRecursiveJsonDeserialize()
+        {
+            const string jsonString = @"
+{
+    ""layerOne"" : {
+        ""anArray"" : [ ""one"", true, 3, ""4"" ],
+        ""layerTwo"" : {
+            ""anotherArray"" : [""short"",""simple""],
+            ""jim"" : ""borden"",
+            ""awesome"" : true
+        },
+        ""aValue"" : ""McLovin""
+    }
+}
+";
+            var expected = new Dictionary<string, object> {
+                
+                { "layerOne", new Dictionary<string, object> {
+                        { "anArray", new List<object> { "one", true, 3, "4" } },
+                        { "layerTwo", new Dictionary<string, object> {
+                                { "anotherArray", new List<object> { "short", "simple" } },
+                                { "jim", "borden" },
+                                { "awesome", true }
+                            }
+                        },
+                        { "aValue", "McLovin" }
+                    }
+                }
+            };
+
+            var parsed = Manager.GetObjectMapper().ReadValue<IDictionary<string, object>>(jsonString);
+            var layerOne = parsed["layerOne"] as Dictionary<string, object>;
+            Assert.IsNotNull(layerOne);
+            Assert.IsTrue(layerOne["anArray"] is List<object>);
+            var layerTwo = layerOne["layerTwo"] as Dictionary<string, object>;
+            Assert.IsNotNull(layerTwo);
+            Assert.IsTrue(layerTwo["anotherArray"] is List<object>);
+            Assert.AreEqual(expected, parsed);
+        }
+
+        [Test]
         public void TestTransientRetryHandler()
         {
             Assert.Inconclusive("Need to implement a scriptable http service, like Square's MockWebServer.");

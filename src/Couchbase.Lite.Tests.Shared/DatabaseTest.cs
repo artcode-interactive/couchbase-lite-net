@@ -46,7 +46,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Sharpen;
 using System.Threading;
-using Newtonsoft.Json.Linq;
 using Couchbase.Lite.Internal;
 using Couchbase.Lite.Util;
 using Couchbase.Lite.Store;
@@ -283,15 +282,15 @@ namespace Couchbase.Lite
         [Test]
         public void TestStubOutAttachmentsInRevBeforeRevPos()
         {
-            var hello = new JObject();
+            var hello = new Dictionary<string, object>();
             hello["revpos"] = 1;
             hello["follows"] = true;
 
-            var goodbye = new JObject();
+            var goodbye = new Dictionary<string, object>();
             goodbye["revpos"] = 2;
             goodbye["data"] = "squeee";
 
-            var attachments = new JObject();
+            var attachments = new Dictionary<string, object>();
             attachments["hello"] = hello;
             attachments["goodbye"] = goodbye;
 
@@ -302,8 +301,8 @@ namespace Couchbase.Lite
 
             var rev = new RevisionInternal(properties);
             Database.StubOutAttachmentsInRevBeforeRevPos(rev, 3, false);
-            var checkAttachments = rev.GetProperties()["_attachments"].AsDictionary<string, object>();
-            var result = (IDictionary<string, object>)checkAttachments["hello"];
+            var checkAttachments = rev.GetPropertyForKey("_attachments") as IDictionary<string, object>;
+            var result = checkAttachments.GetCast<IDictionary<string, object>>("hello");
             expected = new Dictionary<string, object>();
             expected["revpos"] = 1;
             expected["stub"] = true;

@@ -51,7 +51,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Couchbase.Lite.Util;
 using NUnit.Framework;
-using Newtonsoft.Json.Linq;
 using Sharpen;
 
 #if !NET_3_5
@@ -68,7 +67,7 @@ namespace Couchbase.Lite
 
         public delegate long Test(IDictionary<string, object> parameters);
 
-        private JObject _config;
+        private IDictionary<string, object> _config;
 
         public PerformanceTestCase()
         {
@@ -81,8 +80,7 @@ namespace Couchbase.Lite
             Log.SetLogger(null);
 
             var stream = GetAsset("performance-test.json");
-            var reader = new StreamReader(stream);
-            _config = JObject.Parse(reader.ReadToEnd());
+            _config = Manager.GetObjectMapper().ReadValue<IDictionary<string, object>>(stream);
         }
 
         [TearDown]
@@ -250,7 +248,7 @@ namespace Couchbase.Lite
                 return;
             }
 
-            JObject config = (JObject)_config[name];
+            var config = _config[name].AsDictionary<string, object>();
             if (config == null)
             {
                 PrintMessage(name, "No configuration of the test found.");
@@ -265,10 +263,10 @@ namespace Couchbase.Lite
                 return;
             }
 
-            var numDocs = (JArray)config["numbers_of_documents"];
-            var docSizes = (JArray)config["sizes_of_document"];
-            var kpis = (JArray)config["kpi"];
-            var baselines = (JArray)config["baseline"];
+            var numDocs = config["numbers_of_documents"].AsList<object>();
+            var docSizes = config["sizes_of_document"].AsList<object>();
+            var kpis = config["kpi"].AsList<object>();
+            var baselines = config["baseline"].AsList<object>();
             var needsPerDocResult = true;
             if (config["kpi_is_total"] != null && !(Boolean)config["kpi_is_total"])
                 needsPerDocResult = false;
@@ -286,7 +284,7 @@ namespace Couchbase.Lite
                     testCount++;
                     var numDoc = (Int32)numDocs[i];
                     var docSize = (Int32)docSizes[j];
-                    var kpi = (double)((JArray)kpis[i])[j];
+                    var kpi = (double)(kpis[i].AsList<object>())[j];
                     if (kpi < 0 || numDoc < 0 || docSize < 0)
                     {
                         finalResults[i, j] = kpi;
@@ -319,7 +317,7 @@ namespace Couchbase.Lite
                     var result = needsPerDocResult ? (min / numDoc) : min;
                     finalResults[i, j] = result;
 
-                    var baseline = (double)((JArray)baselines[i])[j];
+                    var baseline = (double)(baselines[i].AsList<object>())[j];
                     var deltaFromBaseline = (result - baseline) / baseline * 100;
                     baselineDelta[i, j] = deltaFromBaseline;
 

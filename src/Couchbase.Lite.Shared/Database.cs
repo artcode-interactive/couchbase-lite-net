@@ -1650,10 +1650,10 @@ namespace Couchbase.Lite
                                 status.Code = StatusCode.Ok;
                                 return ancestorAttachment;
                             }
-                        }
 
-                        status.Code = StatusCode.BadAttachment;
-                        return null;
+                            status.Code = StatusCode.BadAttachment;
+                            return null;
+                        }
                     }
 
                     var parentAttachment = parentAttachments == null ? null : parentAttachments.Get(name).AsDictionary<string, object>();

@@ -170,6 +170,7 @@ namespace Couchbase.Lite
         /// <param name="obj">The object to try to convert</param>
         /// <typeparam name="K">The key type of the dictionary</typeparam>
         /// <typeparam name="V">The value type of the dictionary</typeparam>
+        [Obsolete]
         IDictionary<K, V> ConvertToDictionary<K, V>(object obj);
 
         /// <summary>
@@ -179,6 +180,7 @@ namespace Couchbase.Lite
         /// <returns>The .NET list, or null if the object cannot be converted</returns>
         /// <param name="obj">The object to try to convert</param>
         /// <typeparam name="T">The type of object in the list</typeparam>
+        [Obsolete]
         IList<T> ConvertToList<T>(object obj);
 
         /// <summary>

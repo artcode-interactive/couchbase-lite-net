@@ -50,12 +50,12 @@ using Couchbase.Lite.Internal;
 using Couchbase.Lite.Util;
 using NUnit.Framework;
 using Sharpen;
-using Newtonsoft.Json.Linq;
 using System.Threading;
 using Couchbase.Lite.Views;
 using Couchbase.Lite.Tests;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Collections;
 
 namespace Couchbase.Lite
 {
@@ -609,10 +609,10 @@ namespace Couchbase.Lite
             IList<QueryRow> rows = view.QueryWithOptions(options).ToList();
 
             Assert.AreEqual(4, rows.Count);
-            Assert.AreEqual(new object[] { "green", "model1" }, ((JArray)rows[0].Key).ToObject<object[]>());
-            Assert.AreEqual(new object[] { "red", "model1" }, ((JArray)rows[1].Key).ToObject<object[]>());
-            Assert.AreEqual(new object[] { "red", "model2" }, ((JArray)rows[2].Key).ToObject<object[]>());
-            Assert.AreEqual(new object[] { "yellow", "model2" }, ((JArray)rows[3].Key).ToObject<object[]>());
+            CollectionAssert.AreEqual(new object[] { "green", "model1" }, (IEnumerable)rows[0].Key);
+            CollectionAssert.AreEqual(new object[] { "red", "model1" }, (IEnumerable)rows[1].Key);
+            CollectionAssert.AreEqual(new object[] { "red", "model2" }, (IEnumerable)rows[2].Key);
+            CollectionAssert.AreEqual(new object[] { "yellow", "model2" }, (IEnumerable)rows[3].Key);
 
             // Start/end key query:
             options = new QueryOptions();
@@ -620,16 +620,16 @@ namespace Couchbase.Lite
             options.EndKey = new List<object> { "red", new Dictionary<string, object>() };
             rows = view.QueryWithOptions(options).ToList();
             Assert.AreEqual(3, rows.Count);
-            Assert.AreEqual(new object[] { "green", "model1" }, ((JArray)rows[0].Key).ToObject<object[]>());
-            Assert.AreEqual(new object[] { "red", "model1" }, ((JArray)rows[1].Key).ToObject<object[]>());
-            Assert.AreEqual(new object[] { "red", "model2" }, ((JArray)rows[2].Key).ToObject<object[]>());
+            Assert.AreEqual(new object[] { "green", "model1" }, (IEnumerable)rows[0].Key);
+            Assert.AreEqual(new object[] { "red", "model1" }, (IEnumerable)rows[1].Key);
+            Assert.AreEqual(new object[] { "red", "model2" }, (IEnumerable)rows[2].Key);
 
             // Start/end query without inclusive end:
             options.EndKey = new List<object> { "red", "model1" };
             options.InclusiveEnd = false;
             rows = view.QueryWithOptions(options).ToList();
             Assert.AreEqual(1, rows.Count); //1
-            Assert.AreEqual(new object[] { "green", "model1" }, ((JArray)rows[0].Key).ToObject<object[]>());
+            Assert.AreEqual(new object[] { "green", "model1" }, (IEnumerable)rows[0].Key);
 
             // Reversed:
             options = new QueryOptions();
@@ -638,16 +638,16 @@ namespace Couchbase.Lite
             options.Descending = true;
             rows = view.QueryWithOptions(options).ToList();
             Assert.AreEqual(3, rows.Count);
-            Assert.AreEqual(new object[] { "red", "model2" }, ((JArray)rows[0].Key).ToObject<object[]>());
-            Assert.AreEqual(new object[] { "red", "model1" }, ((JArray)rows[1].Key).ToObject<object[]>());
-            Assert.AreEqual(new object[] { "green", "model1" }, ((JArray)rows[2].Key).ToObject<object[]>());
+            Assert.AreEqual(new object[] { "red", "model2" }, (IEnumerable)rows[0].Key);
+            Assert.AreEqual(new object[] { "red", "model1" }, (IEnumerable)rows[1].Key);
+            Assert.AreEqual(new object[] { "green", "model1" }, (IEnumerable)rows[2].Key);
 
             // Reversed, no inclusive end:
             options.InclusiveEnd = false;
             rows = view.QueryWithOptions(options).ToList();
             Assert.AreEqual(2, rows.Count);
-            Assert.AreEqual(new object[] { "red", "model2" }, ((JArray)rows[0].Key).ToObject<object[]>());
-            Assert.AreEqual(new object[] { "red", "model1" }, ((JArray)rows[1].Key).ToObject<object[]>());
+            Assert.AreEqual(new object[] { "red", "model2" }, (IEnumerable)rows[0].Key);
+            Assert.AreEqual(new object[] { "red", "model1" }, (IEnumerable)rows[1].Key);
 
             // Specific keys:
             options = new QueryOptions();
@@ -657,8 +657,8 @@ namespace Couchbase.Lite
             options.Keys = keys;
             rows = view.QueryWithOptions(options).ToList();
             Assert.AreEqual(2, rows.Count);
-            Assert.AreEqual(new object[] { "red", "model2" }, ((JArray)rows[0].Key).ToObject<object[]>());
-            Assert.AreEqual(new object[] { "red", "model1" }, ((JArray)rows[1].Key).ToObject<object[]>());
+            Assert.AreEqual(new object[] { "red", "model2" }, (IEnumerable)rows[0].Key);
+            Assert.AreEqual(new object[] { "red", "model1" }, (IEnumerable)rows[1].Key);
         }
 
         [Test]

@@ -275,7 +275,7 @@ namespace Couchbase.Lite
             }
 
             try {
-                _jsonObject = Manager.GetObjectMapper().ReadValue<IDictionary<string,object>>(_json);
+                _jsonObject = Manager.GetObjectMapper().ReadValue<IDictionary<string, object>>(_json);
             } catch (IOException e) {
                 throw new InvalidDataException("The JSON stored is corrupt", e);
             }

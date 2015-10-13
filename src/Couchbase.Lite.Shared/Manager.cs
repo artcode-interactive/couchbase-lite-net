@@ -203,6 +203,7 @@ namespace Couchbase.Lite
             this.options = options ?? DefaultOptions;
             this.databases = new Dictionary<string, Database>();
             this.replications = new List<Replication>();
+            Shared = new SharedState();
 
             //create the directory, but don't fail if it already exists
             if (!directoryFile.Exists) {
@@ -248,7 +249,6 @@ namespace Couchbase.Lite
 
             SharedCookieStore = new CookieStore(this.directoryFile.FullName);
             StorageType = "SQLite";
-            Shared = new SharedState();
         }
 
     #endregion

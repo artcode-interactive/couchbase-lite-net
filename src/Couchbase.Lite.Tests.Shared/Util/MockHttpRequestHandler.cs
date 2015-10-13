@@ -48,7 +48,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 using System.IO;
-using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
 
 namespace Couchbase.Lite.Tests
@@ -259,19 +258,8 @@ namespace Couchbase.Lite.Tests
         {
             var bytesTask = request.Content.ReadAsByteArrayAsync();
             bytesTask.Wait(TimeSpan.FromSeconds(3));
-            var value = Manager.GetObjectMapper().ReadValue<object>(bytesTask.Result);
-
-            IDictionary<string, object> jsonMap = null;
-            if (value is JObject)
-            {
-                jsonMap = ((JObject)value).ToObject<IDictionary<string, object>>();
-            }
-            else
-            {
-                jsonMap = (IDictionary<string, object>)value;
-            }
-
-            return jsonMap;
+            var value = Manager.GetObjectMapper().ReadValue<IDictionary<string, object>>(bytesTask.Result);
+            return value;
         }
 
         public static HttpResponseMessage GenerateHttpResponseMessage(IDictionary<string, object> content)
@@ -324,9 +312,9 @@ namespace Couchbase.Lite.Tests
             var jsonMap = GetJsonMapFromRequest(request);
             var responseList = new List<IDictionary<string, object>>();
 
-            var docs = ((JArray)jsonMap["docs"]).ToList();
+            var docs = jsonMap["docs"].AsList<object>();
 
-            foreach (JObject doc in docs)
+            foreach (IDictionary<string, object> doc in docs)
             {
                 IDictionary<string, object> responseListItem = new Dictionary<string, object>();
                 responseListItem["id"] = doc["_id"];

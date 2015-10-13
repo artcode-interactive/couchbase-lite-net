@@ -119,16 +119,6 @@ namespace Couchbase.Lite
             return ManagerOptions.SerializationEngine.Deserialize<T>(jsonStream);
         }
 
-        public IDictionary<K, V> ConvertToDictionary<K, V>(object obj)
-        {
-            return ManagerOptions.SerializationEngine.ConvertToDictionary<K, V>(obj) ?? obj as IDictionary<K,V>;
-        }
-
-        public IList<T> ConvertToList<T>(object obj)
-        {
-            return ManagerOptions.SerializationEngine.ConvertToList<T>(obj) ?? obj as IList<T>;
-        }
-
         #endregion
 
         #region Private Methods

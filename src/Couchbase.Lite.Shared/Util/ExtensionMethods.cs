@@ -165,14 +165,63 @@ namespace Couchbase.Lite
             }
         }
 
-        internal static IDictionary<TKey,TValue> AsDictionary<TKey, TValue>(this object attachmentProps)
+        internal static IDictionary<TKey,TValue> AsDictionary<TKey, TValue>(this object value)
         {
-            return Manager.GetObjectMapper().ConvertToDictionary<TKey, TValue>(attachmentProps);
+            if (value == null) {
+                return null;
+            }
+
+            var retVal = value as IDictionary<TKey, TValue>;
+            if (retVal != null) {
+                return retVal;
+            }
+
+            var tmp = value as IDictionary;
+            if (tmp == null) {
+                return null;
+            }
+
+            retVal = (IDictionary<TKey,TValue>)Activator.CreateInstance(typeof(Dictionary<,>).MakeGenericType(typeof(TKey), typeof(TValue)));
+            foreach (var key in tmp.Keys) {
+                TKey castKey;
+                TValue castVal;
+                if (!TryCast<TKey>(key, out castKey) || !TryCast<TValue>(tmp[key], out castVal)) {
+                    return null;
+                }
+
+                retVal[castKey] = castVal;
+            }
+
+            return retVal;
         }
 
         internal static IList<TValue> AsList<TValue>(this object value)
         {
-            return Manager.GetObjectMapper().ConvertToList<TValue>(value);
+            if (value == null) {
+                return null;
+            }
+
+            var retVal = value as IList<TValue>;
+            if (retVal != null) {
+                return retVal;
+            }
+
+            var tmp = value as IList;
+            if (tmp == null) {
+                return null;
+            }
+
+            retVal = (IList<TValue>)Activator.CreateInstance(typeof(List<>).MakeGenericType(typeof(TValue)));
+            foreach (var item in tmp) {
+                TValue next;
+                if (!TryCast<TValue>(item, out next)) {
+                    return null;
+                }
+
+                retVal.Add(next);
+            }
+
+            return retVal;
         }
 
         public static IEnumerable ToEnumerable(this IEnumerator enumerator)

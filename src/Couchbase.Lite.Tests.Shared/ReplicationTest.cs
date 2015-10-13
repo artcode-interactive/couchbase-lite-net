@@ -59,7 +59,6 @@ using Couchbase.Lite.Internal;
 using Couchbase.Lite.Replicator;
 using Couchbase.Lite.Util;
 using Couchbase.Lite.Tests;
-using Newtonsoft.Json.Linq;
 using System.Threading;
 using Couchbase.Lite.Listener.Tcp;
 using System.Text.RegularExpressions;
@@ -148,8 +147,7 @@ namespace Couchbase.Lite
             using(var client = new HttpClient()) {
                 var response = client.SendAsync(request).Result;
                 var result = response.Content.ReadAsStringAsync().Result;
-                var json = Manager.GetObjectMapper().ReadValue<JObject>(result);
-                return json.AsDictionary<string, object>();
+                return Manager.GetObjectMapper().ReadValue<IDictionary<string, object>>(result);
             }
         }
 
@@ -1319,7 +1317,7 @@ namespace Couchbase.Lite
                     if (uriString.EndsWith("_revs_diff", StringComparison.Ordinal)) {
                         foundRevsDiff = true;
                         var jsonMap = MockHttpRequestHandler.GetJsonMapFromRequest(httpRequest);
-                        var revisionIds = ((JArray)jsonMap.Get(doc.Id)).Values<string>().ToList();
+                        var revisionIds = jsonMap.Get(doc.Id).AsList<string>();
                         Assert.AreEqual(2, revisionIds.Count);
                         Assert.IsTrue(revisionIds.Contains(rev4a.Id));
                         Assert.IsTrue(revisionIds.Contains(rev2b.Id));
@@ -1359,19 +1357,19 @@ namespace Couchbase.Lite
                 RunReplication(pusher);
                 Assert.IsNull(pusher.LastError);
 
-                var rev3aBody = new JObject();
+                var rev3aBody = new Dictionary<string, object>();
                 rev3aBody.Put("_id", doc.Id);
                 rev3aBody.Put("_rev", rev2a.Id);
 
                 // Then, delete rev 2b.
-                var rev3bBody = new JObject();
+                var rev3bBody = new Dictionary<string, object>();
                 rev3bBody.Put("_id", doc.Id);
                 rev3bBody.Put("_rev", rev2b.Id);
                 rev3bBody.Put("_deleted", true);
 
                 // Combine into one _bulk_docs request.
-                var requestBody = new JObject();
-                var docs = new JArray { rev3aBody, rev3bBody };
+                var requestBody = new Dictionary<string, object>();
+                var docs = new List<object> { rev3aBody, rev3bBody };
                 requestBody.Put("docs", docs);
 
                 // Make the _bulk_docs request.
@@ -1386,10 +1384,10 @@ namespace Couchbase.Lite
                     Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
 
                     var rawResponse = response.Content.ReadAsStringAsync().Result;
-                    var resultArray = Manager.GetObjectMapper().ReadValue<JArray>(rawResponse);
+                    var resultArray = Manager.GetObjectMapper().ReadValue<IList<object>>(rawResponse);
                     Assert.AreEqual(2, resultArray.Count);
 
-                    foreach (var value in resultArray.Values<JObject>()) {
+                    foreach (var value in resultArray.Cast<IDictionary<string, object>>()) {
                         var err = (string)value["error"];
                         Assert.IsNull(err);
                     }
@@ -1850,7 +1848,7 @@ namespace Couchbase.Lite
             using(var client = new HttpClient()) {
                 var response = client.SendAsync(request).Result;
                 var result = response.Content.ReadAsStringAsync().Result;
-                var json = Manager.GetObjectMapper().ReadValue<JObject>(result);
+                var json = Manager.GetObjectMapper().ReadValue<IDictionary<string, object>>(result);
                 return json.AsDictionary<string, object>();
             }
         }
@@ -1935,7 +1933,7 @@ namespace Couchbase.Lite
                     request.RequestUri.AbsoluteUri.EndsWith("_bulk_docs", StringComparison.Ordinal)) {
                         var bytes = request.Content.ReadAsByteArrayAsync().Result;
                         var body = Manager.GetObjectMapper().ReadValue<IDictionary<string, object>>(bytes.AsEnumerable());
-                        var docs = (JArray)body["docs"];
+                        var docs = body["docs"].AsList<object>();
                         numDocsSent += docs.Count;
                     }
                 }
