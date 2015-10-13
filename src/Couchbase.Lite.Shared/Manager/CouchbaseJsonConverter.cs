@@ -29,6 +29,14 @@ namespace Couchbase.Lite.Util
 {
     internal sealed class CouchbaseJsonConverter : JsonConverter
     {
+        private static readonly HashSet<string> SPECIAL_TYPE_PREFIXES = new HashSet<string> {
+            "System.Collections.Generic.IList`1",
+            "System.Collections.Generic.List`1",
+            "System.Collections.Generic.IDictionary`2",
+            "System.Collections.Generic.Dictionary`2",
+            "System.Object"
+        };
+
         public override bool CanConvert(Type objectType)
         {
             return true;
@@ -46,9 +54,15 @@ namespace Couchbase.Lite.Util
 
         private static object ToObject(JToken token, Type objectType)
         {
-            if (objectType.FullName.StartsWith("System.Collections.Generic.IList`1") ||
-               objectType.FullName.StartsWith("System.Collections.Generic.IDictionary`2") || 
-               objectType.FullName.StartsWith("System.Object")) {
+            var special = false;
+            foreach (var prefix in SPECIAL_TYPE_PREFIXES) {
+                if (objectType.FullName.StartsWith(prefix)) {
+                    special = true;
+                    break;
+                }
+            }
+
+            if (special) {
                 switch (token.Type)
                 {
                     case JTokenType.Object:

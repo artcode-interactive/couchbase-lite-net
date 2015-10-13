@@ -47,6 +47,7 @@ namespace Couchbase.Lite
         #region Variables
 
         private JsonTextReader _textReader;
+        private JsonSerializer _serializer = JsonSerializer.Create(settings);
 
         #endregion
 
@@ -84,10 +85,9 @@ namespace Couchbase.Lite
         {
             using (var jsonReader = new JsonTextReader(new StreamReader(json))) 
             {
-                var serializer = JsonSerializer.Create(settings);
                 T item;
                 try {
-                    item = serializer.Deserialize<T>(jsonReader);
+                    item = _serializer.Deserialize<T>(jsonReader);
                 } catch (JsonException e) {
                     throw new CouchbaseLiteException(e, StatusCode.BadJson);
                 }
@@ -122,7 +122,7 @@ namespace Couchbase.Lite
             }
 
             try {
-                return JObject.ReadFrom(_textReader).ToObject<IDictionary<string, object>>();
+                return JObject.ReadFrom(_textReader).ToObject<IDictionary<string, object>>(_serializer);;
             } catch(Exception e) {
                 throw new CouchbaseLiteException(e, StatusCode.BadJson);
             }

@@ -591,5 +591,21 @@ namespace Couchbase.Lite
         }
 
         #endregion
+
+        #region Overrides
+
+        public override string ToString()
+        {
+            return string.Format("[QueryOptions: StartKey={0}, EndKey={1}, Keys={2}, Skip={3},{22}" +
+                "Limit={4}, GroupLevel={5}, ContentOptions={6}, Descending={7}, IncludeDocs={8},{22}" +
+                "IncludeDeletedDocs={9}, UpdateSeq={10}, InclusiveStart={11}, InclusiveEnd={12}, Reduce={13},{22}" +
+                "ReduceSpecified={14}, Group={15}, Stale={16}, AllDocsMode={17}, StartKeyDocId={18},{22}" +
+                "EndKeyDocId={19}, PrefixMatchLevel={20}, Filter={21}]", StartKey, EndKey, Keys, Skip, Limit, 
+                GroupLevel, ContentOptions, Descending, IncludeDocs, IncludeDeletedDocs, UpdateSeq, InclusiveStart, 
+                InclusiveEnd, Reduce, ReduceSpecified, Group, Stale, AllDocsMode, StartKeyDocId, EndKeyDocId, PrefixMatchLevel, 
+                Filter, Environment.NewLine);
+        }
+
+        #endregion
     }
 }
