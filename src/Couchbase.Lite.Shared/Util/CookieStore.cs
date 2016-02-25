@@ -58,6 +58,12 @@ namespace Couchbase.Lite.Util
     /// </summary>
     public class CookieStore : CookieContainer
     {
+        #region Public parameters
+
+        public bool PersistCookies { get { return _persistCookies; } }
+
+        #endregion
+        
 
         #region Constants
 
@@ -70,6 +76,7 @@ namespace Couchbase.Lite.Util
         private readonly object locker = new object();
         private readonly DirectoryInfo directory;
         private HashSet<Uri> _cookieUriReference = new HashSet<Uri>();
+        private bool _persistCookies = false;
 
         #endregion
 
@@ -84,8 +91,9 @@ namespace Couchbase.Lite.Util
         /// Default constructor
         /// </summary>
         /// <param name="directory">The directory to serialize the cookies to</param>
-        public CookieStore(String directory) 
+        public CookieStore(String directory, bool persistCookiesToDisk = false) 
         {
+            _persistCookies = persistCookiesToDisk;
             if (directory != null) {
                 this.directory = new DirectoryInfo(directory);
             }
@@ -109,7 +117,9 @@ namespace Couchbase.Lite.Util
                 _cookieUriReference.Add(new Uri(urlString));
             }
 
-            Save();
+            if (PersistCookies) {
+                Save();
+            }
         }
 
         /// <summary>
@@ -152,7 +162,9 @@ namespace Couchbase.Lite.Util
                 if (delete) {
                     // Trigger container cookie list refreshment
                     GetCookies(uri);
-                    Save();
+                    if (PersistCookies) {
+                        Save();
+                    }
                 }
             }
         }
