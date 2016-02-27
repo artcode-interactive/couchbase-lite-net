@@ -1,11 +1,9 @@
-﻿using System;
+﻿
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Couchbase.Lite.Util;
-
-// using UnityEngine;
 
 namespace Couchbase.Lite.Unity
 {
@@ -26,8 +24,7 @@ namespace Couchbase.Lite.Unity
         {
             get
             {
-                if (_taskScheduler == null)
-                {
+                if (_taskScheduler == null) {
                     _taskScheduler = new SingleThreadScheduler(Thread.CurrentThread, _jobQueue);
                 }
 
@@ -40,13 +37,11 @@ namespace Couchbase.Lite.Unity
         {
             get
             {
-                if (_taskFactory != null)
-                {
+                if (_taskFactory != null) {
                     return _taskFactory;
                 }
 
-                if (_taskFactory == null && _taskScheduler != null)
-                {
+                if (_taskFactory == null && _taskScheduler != null) {
                     _taskFactory = new TaskFactory(_taskScheduler);
                 }
 
@@ -54,14 +49,12 @@ namespace Couchbase.Lite.Unity
             }
         }
 
-        public static void Update()
+        void Update()
         {
-            if (_jobQueue != null && _taskScheduler != null) 
-            {
+            if (_jobQueue != null && _taskScheduler != null) {
                 Task nextTask;
                 bool gotTask = _jobQueue.TryTake(out nextTask);
-                if (gotTask && nextTask.Status == TaskStatus.WaitingToRun) 
-                {
+                if (gotTask && nextTask.Status == TaskStatus.WaitingToRun) {
                     _taskScheduler.TryExecuteTaskHack(nextTask);
                 }
             }
