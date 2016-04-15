@@ -49,7 +49,7 @@ namespace Couchbase.Lite.Unity
             }
         }
 
-        void Update()
+        public static void Update()
         {
             if (_jobQueue != null && _taskScheduler != null) {
                 Task nextTask;

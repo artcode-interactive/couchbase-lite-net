@@ -57,13 +57,6 @@ namespace Couchbase.Lite.Unity
 
         public static string PersistentDataPath { get; private set; }
 
-        public static bool TaskSchedulerReady
-        {
-            get {
-                return _taskScheduler != null;
-            }
-        }
-
         /// <summary>
         /// Provides a check that _taskScheduler has been initialized to avoid an exception in the TaskScheduler getter below
         /// </summary>
