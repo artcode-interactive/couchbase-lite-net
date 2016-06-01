@@ -91,14 +91,16 @@ namespace Couchbase.Lite.Util
         /// Default constructor
         /// </summary>
         /// <param name="directory">The directory to serialize the cookies to</param>
-        public CookieStore(String directory, bool persistCookiesToDisk = false) 
+        public CookieStore(String directory, bool persistCookiesToAndLoadFromDisk = false) 
         {
-            _persistCookies = persistCookiesToDisk;
+            _persistCookies = persistCookiesToAndLoadFromDisk;
             if (directory != null) {
                 this.directory = new DirectoryInfo(directory);
             }
 
-            DeserializeFromDisk();
+            if (persistCookiesToAndLoadFromDisk) {
+                DeserializeFromDisk();
+            }
         }
 
         #endregion
@@ -174,8 +176,10 @@ namespace Couchbase.Lite.Util
         /// </summary>
         public void Save()
         {
-            lock (locker) {
-                SerializeToDisk();
+            if (_persistCookies) {
+                lock (locker) {
+                    SerializeToDisk();
+                }
             }
         }
 
